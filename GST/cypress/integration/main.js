@@ -10,22 +10,11 @@ describe("EMC Pharmaceutical Automation Tests", () => {
 
     it.only("Click through alphabetical list", () => {
         cy.visit("https://www.medicines.org.uk/emc/browse-companies")
-        
-        let selectobj = [ 
-            {
-                "selector": ".ieleft > ul:nth-child(1) > li a",
-                "pos": 0
-            }, 
-            {
-                "selector": ".ieleft > ul:nth-child(1) > li a",
-                "pos": 2
-            }, 
-            {
-                "selector": ".ieright > ul:nth-child(1) > li a",
-                "pos": -1
-            },
-        ]
 
+        let selectobj = [ 
+            0, 2, -1,
+        ]
+                
         // Click through alphabetical list
         cy.get(".browse > li a")
         .each((item, index, list) => {
@@ -35,12 +24,12 @@ describe("EMC Pharmaceutical Automation Tests", () => {
                 // Iterate through each selectobj and grab them from the alpha page if it exists
                 cy.wrap(selectobj).each((selpos) =>{
                     // Get list from selector in selpos
-                    cy.get(selpos.selector).then((initem) => {
+                    cy.get('.key').then((initem) => {
                         // If the grabbed list contains the right number of elements continue
                         //cy.log("selpos:" + selpos.pos + " | list length: " + initem.length)
-                        if(initem.length > (selpos.pos>-1 ? selpos.pos : 0)){
+                        if(initem.length > (selpos>-1 ? selpos : 0)){
                             //grab item out of list
-                            cy.wrap(initem).eq(selpos.pos).then((firstItem) => {
+                            cy.wrap(initem).eq(selpos).then((firstItem) => {
                                 cy.wrap(firstItem).invoke('attr', 'href').then((inhref) =>{
                                     // Grab the href from the item in the list ad visit it
                                     cy.visit(BASEURL + inhref).then(() => {
@@ -57,72 +46,7 @@ describe("EMC Pharmaceutical Automation Tests", () => {
             // Save scraped data
             cy.writeFile("pharma_data.json", JSON.stringify(pharmaData))
         })
-        
-        /*
-        // Grab alphabetical list
-        cy.get(".browse > li a")
-        .each((item, index, list) => {
-            //if (index == 10) {return false;}
-            // Clicks through alpgabetical list
-            cy.wrap(item).invoke('attr', 'href').then((inhref) =>{
-                cy.visit(BASEURL + inhref)
-
-                // Click the links in the list
-                cy.get(".ieleft > ul:nth-child(1) > li a").then((initem) => {
-                    if(initem.length > 0){
-                        cy.wrap(initem).first().then((firstItem) => {
-                            cy.wrap(firstItem).invoke('attr', 'href').then((inhref) =>{
-                                cy.visit(BASEURL + inhref).then(() => {
-                                    grabWebsiteData(".col-md-5 > .gfdCompanyDetailsCol", ".col-md-4 > .gfdCompanyDetailsCol", ".companyLogoWrapper img", "h1")
-                                })
-                            })
-                        })
-                    }
-                })
-
-                cy.go('back')
-                
-                cy.get(".ieleft > ul:nth-child(1) > li a").then((initem) => {
-                    if(initem.length > 3){
-                        cy.wrap(initem).eq(2).then((firstItem) => {
-                            cy.wrap(firstItem).invoke('attr', 'href').then((inhref) =>{
-                                cy.visit(BASEURL + inhref).then(() => {
-                                    grabWebsiteData(".col-md-5 > .gfdCompanyDetailsCol", ".col-md-4 > .gfdCompanyDetailsCol", ".companyLogoWrapper img", "h1")
-                                })
-                            })
-                        })
-                    }
-                })
-
-                cy.go('back')
-                
-                cy.get(".ieright > ul:nth-child(1) > li a").then((initem) => {
-                    if(initem.length > 0){
-                        cy.wrap(initem).last().then((firstItem) => {
-                            cy.wrap(firstItem).invoke('attr', 'href').then((inhref) =>{
-                                cy.visit(BASEURL + inhref).then(() => {
-                                    grabWebsiteData(".col-md-5 > .gfdCompanyDetailsCol", ".col-md-4 > .gfdCompanyDetailsCol", ".companyLogoWrapper img", "h1")
-                                })
-                            })
-                        })
-                    }
-                })
-
-                cy.go('back')
-                
-            })
-
-        })
-        .then(()=>{
-            console.log(pharmaData)
-            cy.writeFile("pharma_data.json", JSON.stringify(pharmaData))
-        })
-        */
     })
-
-    function index(){
-
-    }
 
     function grabWebsiteData(list1, list2, imageselector, intitle){
         let titles = [];
