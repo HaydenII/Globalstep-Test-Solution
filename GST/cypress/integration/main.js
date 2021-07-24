@@ -54,6 +54,11 @@ describe("EMC Pharmaceutical Automation Tests", () => {
 
         var jsonData = {};
 
+        
+
+
+
+
         // Get general data per data block on page
         let expecttitle = true;
         cy.wrap([list1, list2]).each((inList) =>{
@@ -77,34 +82,25 @@ describe("EMC Pharmaceutical Automation Tests", () => {
                 }
             })
 
-        }).then(() => {
-        // ---
-
+        })
         // Get title
-        cy.get(intitle).then((titleelem) =>{
+        const title_promise = cy.get(intitle).then((titleelem) =>{
             jsonData["title"] = titleelem.text()
         })
-        .then(() =>{
-        // ---
 
-        // Get and download image
-        cy.get(imageselector).then((imgelem) =>{
+        const image_promise = cy.get(imageselector).then((imgelem) =>{
             cy.wrap(imgelem).invoke('attr', 'src').then((insrc) =>{
                 jsonData["image src"] = insrc
                 cy.downloadFile("https://www.medicines.org.uk" + insrc,'DL_images', jsonData["title"] + '.jpg','MyCustomAgentName')
             })
-        }).then(() =>{
-        // ---
-
-        // Insert data into dictionary
-        for(let i = 0; i < titles.length; i++){
-            jsonData[titles[i]] = data[i].replace(/[\n\t]/g, '')
-        }
-        pharmaData.pharmas.push(jsonData)
-        // ---
-
         })
-        })
+
+
+        Promise.all([title_promise, image_promise]).then(() =>{
+            for(let i = 0; i < titles.length; i++){
+                jsonData[titles[i]] = data[i].replace(/[\n\t]/g, '')
+            }
+            pharmaData.pharmas.push(jsonData)
         })
 
     }
